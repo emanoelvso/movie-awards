@@ -10,7 +10,7 @@ export class MovieController {
       relations: ['movies'],
     });
 
-    const intervals: any[] = [];
+    const intervalsMap: Record<number, Record<string, any>[]> = {};
 
     for (const producer of producers) {
       const wins = producer.movies
@@ -18,16 +18,36 @@ export class MovieController {
         .map((m) => m.year)
         .sort((a, b) => a - b);
 
-      for (let i = 1; i < wins.length; i++) {
-        intervals.push({
-          producer: producer.name,
-          interval: wins[i] - wins[i - 1],
-          previousWin: wins[i - 1],
-          followingWin: wins[i],
-        });
+      if (wins.length > 1) {
+        for (let i = 1; i < wins.length; i++) {
+          const interval = wins[i] - wins[i - 1];
+          if (intervalsMap[interval]) {
+            intervalsMap[interval].push({
+              producer: producer.name,
+              interval: wins[i] - wins[i - 1],
+              previousWin: wins[i - 1],
+              followingWin: wins[i],
+            });
+          } else {
+            intervalsMap[interval] = [
+              {
+                producer: producer.name,
+                interval: wins[i] - wins[i - 1],
+                previousWin: wins[i - 1],
+                followingWin: wins[i],
+              },
+            ];
+          }
+        }
       }
     }
 
-    return intervals;
+    const intervals = Object.keys(intervalsMap);
+    const response = {
+      min: intervalsMap[intervals[0]],
+      max: intervalsMap[intervals[intervals.length - 1]],
+    };
+
+    return response;
   }
 }
