@@ -1,0 +1,12 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": "..",
+  "testEnvironment": "node",
+  "moduleNameMapper": {
+    "^@movieModule/(.*)$": "<rootDir>/src/module/movie/$1"
+  },
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "testMatch": ["<rootDir>/src/**/__test__/e2e/**/*.spec.ts"]
+}
