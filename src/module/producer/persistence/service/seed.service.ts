@@ -1,10 +1,10 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
-import { MovieRepository } from '../../persistence/repository/movie.repository';
-import { ProducerRepository } from '../../persistence/repository/producer.repository';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { MovieRepository } from '../repository/movie.repository';
+import { ProducerRepository } from '../repository/producer.repository';
 import { CsvService } from '../../infra/module/csv/csv.service';
-import { Movie } from '../../persistence/entity/movie.entity';
-import { Producer } from '../../persistence/entity/producer.entity';
-import path from 'path';
+import { Movie } from '../entity/movie.entity';
+import { Producer } from '../entity/producer.entity';
+import { SeedConfig } from '../interface/seed.config';
 
 export interface CreateMovieData {
   year: string;
@@ -17,22 +17,21 @@ export interface CreateMovieData {
 @Injectable()
 export class SeedService implements OnModuleInit {
   constructor(
+    @Inject(SeedConfig) private seedConfig: SeedConfig,
     private readonly movieRepository: MovieRepository,
     private readonly producerRepository: ProducerRepository,
     private readonly csvService: CsvService,
   ) {}
   async onModuleInit() {
-    // await this.movieRepository.deleteAll();
-    // await this.producerRepository.deleteAll();
+    if (this.seedConfig.deleteBeforeInsert) {
+      await this.deleteAll();
+    }
 
     const records = await this.movieRepository.count();
 
     if (records === 0) {
-      // TODO: ENV
       const rows = await this.csvService.parseCsv<CreateMovieData>(
-        path.join(
-          process.cwd() + '/src/module/movie/persistence/seed/Movielist.csv',
-        ),
+        this.seedConfig.csvPath,
       );
 
       for (const row of rows) {
@@ -51,6 +50,11 @@ export class SeedService implements OnModuleInit {
         await this.movieRepository.save(movie);
       }
     }
+  }
+
+  private async deleteAll(): Promise<void> {
+    await this.movieRepository.deleteAll();
+    await this.producerRepository.deleteAll();
   }
 
   private async upsertProducers(raw: string): Promise<Producer[]> {

@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { MovieModule } from './module/movie/movie.module';
+import { ProducerModule } from '@producerModule/producer.module';
 
 @Module({
-  imports: [MovieModule],
+  imports: [ProducerModule.forRoot()],
 })
 export class AppModule {}

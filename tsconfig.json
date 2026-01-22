@@ -23,7 +23,8 @@
     "noFallthroughCasesInSwitch": false,
     "useDefineForClassFields": false,
     "paths": {
-      "@movieModule/*": ["./src/module/movie/*"]
+      "@producerModule/*": ["src/module/producer/*"],
+      "@testInfra/*": ["./test/*"]
     }
   }
 }

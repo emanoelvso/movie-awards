@@ -1,16 +1,26 @@
-import { ProducerRepository } from '@movieModule/persistence/repository/producer.repository';
-import { Controller, Get } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { ProducerRepository } from '../..//persistence/repository/producer.repository';
 
-@Controller('movie')
-export class MovieController {
+interface ProducerInterval {
+  producer: string;
+  interval: number;
+  previousWin: number;
+  followingWin: number;
+}
+
+@Injectable()
+export class ProducerService {
   constructor(private readonly producerRepository: ProducerRepository) {}
-  @Get('/producers')
-  async getProducers() {
+
+  async getMinMaxIntervals(): Promise<{
+    min: ProducerInterval[];
+    max: ProducerInterval[];
+  }> {
     const producers = await this.producerRepository.find({
       relations: ['movies'],
     });
 
-    const intervalsMap: Record<number, Record<string, any>[]> = {};
+    const intervalsMap: Record<number, ProducerInterval[]> = {};
 
     for (const producer of producers) {
       const wins = producer.movies
@@ -43,11 +53,13 @@ export class MovieController {
     }
 
     const intervals = Object.keys(intervalsMap);
-    const response = {
-      min: intervalsMap[intervals[0]],
-      max: intervalsMap[intervals[intervals.length - 1]],
-    };
-
-    return response;
+    return intervals.length > 0
+      ? {
+          min: intervalsMap[intervals[0]] as ProducerInterval[],
+          max: intervalsMap[
+            intervals[intervals.length - 1]
+          ] as ProducerInterval[],
+        }
+      : { min: [], max: [] };
   }
 }

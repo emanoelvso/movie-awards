@@ -5,4 +5,4 @@ import { CsvService } from './csv.service';
   providers: [CsvService],
   exports: [CsvService],
 })
-export class PapaParserModule {}
+export class CsvModule {}

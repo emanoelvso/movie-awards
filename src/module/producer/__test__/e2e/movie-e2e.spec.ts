@@ -1,16 +1,17 @@
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { MovieModule } from '../../movie.module';
 import request from 'supertest';
 import { App } from 'supertest/types';
+import { testDbClient } from '@testInfra/knex.database';
+import { ProducerModule } from '../../producer.module';
 
-describe('MovieController (e2e)', () => {
+describe('ProducerController (e2e)', () => {
   let module: TestingModule;
   let app: INestApplication;
 
   beforeAll(async () => {
     module = await Test.createTestingModule({
-      imports: [MovieModule],
+      imports: [ProducerModule.forRoot()],
     }).compile();
     app = module.createNestApplication();
 
@@ -18,13 +19,14 @@ describe('MovieController (e2e)', () => {
   });
 
   afterAll(async () => {
+    await app.close();
     await module.close();
   });
 
   describe('/movie/producers (GET)', () => {
     it('should return min and max correctly', async () => {
       await request(app.getHttpServer() as App)
-        .get('/movie/producers')
+        .get('/producer/interval')
         .expect(HttpStatus.OK)
         .expect((response) => {
           expect(response.body).toMatchObject({
@@ -46,6 +48,37 @@ describe('MovieController (e2e)', () => {
             ],
           });
         });
+
+      // Check DB filled
+      expect(await testDbClient('movie').count()).toEqual([
+        { 'count(*)': 206 },
+      ]);
+      expect(await testDbClient('producer').count()).toEqual([
+        { 'count(*)': 359 },
+      ]);
+    });
+
+    it('should return empty array when database is empty', async () => {
+      const server = request(app.getHttpServer() as App);
+
+      await testDbClient('movie').del();
+      await testDbClient('producer').del();
+
+      await server
+        .get('/producer/interval')
+        .expect(HttpStatus.OK)
+        .expect((response) => {
+          expect(response.body).toMatchObject({
+            min: [],
+            max: [],
+          });
+        });
+
+      // Check DB empty
+      expect(await testDbClient('movie').count()).toEqual([{ 'count(*)': 0 }]);
+      expect(await testDbClient('producer').count()).toEqual([
+        { 'count(*)': 0 },
+      ]);
     });
   });
 });
