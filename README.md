@@ -45,4 +45,4 @@ $ yarn run test:cov
 
 ## Run Docs
 
-Access (API Documentation)[http:localhost:3000/docs]
+Access [API Documentation](http:localhost:3000/docs)
