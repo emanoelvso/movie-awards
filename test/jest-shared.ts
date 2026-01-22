@@ -1,0 +1,15 @@
+export default {
+  moduleFileExtensions: ['js', 'json', 'ts'],
+  rootDir: '..',
+  testEnvironment: 'node',
+  transformIgnorePatterns: [
+    '/node_modules/(?!(@faker-js/faker|factory\\.ts)/)',
+  ],
+  moduleNameMapper: {
+    '^@producerModule/(.*)$': '<rootDir>/src/module/producer/$1',
+    '^@testInfra/(.*)$': '<rootDir>/test/$1',
+  },
+  transform: {
+    '^.+\\.(t|j)s$': 'ts-jest',
+  },
+};
