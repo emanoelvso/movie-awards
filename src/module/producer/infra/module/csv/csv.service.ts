@@ -12,7 +12,6 @@ export class CsvService {
           reject(error);
         })
         .on('data', (row: T) => {
-          // console.log(row);
           list.push(row);
         })
         .on('end', (rowCount: number) => {

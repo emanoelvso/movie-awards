@@ -10,6 +10,19 @@ The Node version used: 22.19.0
 $ yarn install
 ```
 
+## Database
+
+```bash
+# Generate Migrations
+yarn run db:generate
+
+# Migrate Migrations
+yarn run db:migrate
+
+# Drop Migrations
+yarn run db:drop
+```
+
 ## Compile and run the project
 
 ```bash
