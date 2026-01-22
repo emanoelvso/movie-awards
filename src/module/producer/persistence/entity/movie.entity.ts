@@ -11,7 +11,7 @@ export class Movie extends DefaultEntity<Movie> {
   title: string;
 
   @Column({ type: 'simple-array', nullable: false })
-  studios: string[];
+  studios: string[] | string;
 
   @ManyToMany(() => Producer, (producer) => producer.movies, { cascade: true })
   @JoinTable()
